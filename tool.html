@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="title">截图圆角阴影生成器 - 截图美化工具</title>
+    <meta name="description" data-i18n="meta-desc" content="免费在线截图圆角阴影生成器，上传截图拖动滑块即可添加圆角和阴影，让截图一秒变好看。">
+    <style>
+        :root {
+            --bg: #f5f5f7;
+            --card-bg: #ffffff;
+            --text: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --border: #e5e5ea;
+            --accent: #0071e3;
+            --radius: 14px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.6;
+        }
+
+        /* ===== 导航栏 ===== */
+        nav {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: 56px;
+        }
+        .nav-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+        }
+        .nav-logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+            align-items: center;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.15s;
+        }
+        .nav-links a:hover { color: var(--accent); }
+        .nav-links a.active { color: var(--accent); }
+
+        /* 语言切换按钮 */
+        .lang-switch {
+            background: none;
+            border: 1.5px solid var(--border);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .lang-switch:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* ===== 工具主体 ===== */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 32px 20px 80px;
+        }
+        .tool-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .tool-header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+        .tool-header p {
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        /* 上传区域 */
+        .upload-area {
+            background: var(--card-bg);
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 48px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 24px;
+        }
+        .upload-area:hover {
+            border-color: var(--accent);
+            background: #f0f7ff;
+        }
+        .upload-area.dragover {
+            border-color: var(--accent);
+            background: #f0f7ff;
+        }
+        .upload-icon { font-size: 48px; margin-bottom: 12px; }
+        .upload-area p { font-size: 15px; color: var(--text-secondary); }
+        .upload-area .sub { font-size: 13px; color: #aeaeb2; margin-top: 4px; }
+        #fileInput { display: none; }
+
+        /* 预览区 */
+        .preview-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            display: none;
+        }
+        .preview-section.active { display: block; }
+        .preview-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 32px 16px;
+            background: repeating-conic-gradient(#f0f0f0 0% 25%, transparent 0% 50%) 50% / 20px 20px;
+            border-radius: 8px;
+            min-height: 200px;
+        }
+        .preview-wrapper img {
+            max-width: 100%;
+            max-height: 400px;
+            display: block;
+            transition: border-radius 0.1s, box-shadow 0.1s;
+        }
+
+        /* 控制区 */
+        .controls {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            display: none;
+        }
+        .controls.active { display: block; }
+        .control-group {
+            margin-bottom: 20px;
+        }
+        .control-group:last-child { margin-bottom: 0; }
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .control-label span.val {
+            font-weight: 400;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e0e0e0;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            border: 3px solid #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+        }
+
+        /* 阴影开关和颜色 */
+        .shadow-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .toggle-switch input { display: none; }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #ccc;
+            border-radius: 24px;
+            transition: 0.2s;
+        }
+        .toggle-slider:before {
+            content: "";
+            position: absolute;
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: #fff;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+        input:checked + .toggle-slider { background: var(--accent); }
+        input:checked + .toggle-slider:before { transform: translateX(20px); }
+        .shadow-color-input {
+            width: 36px;
+            height: 28px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        /* 按钮 */
+        .btn-download {
+            display: block;
+            width: 100%;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.15s;
+            box-shadow: 0 2px 8px rgba(0,113,227,0.25);
+        }
+        .btn-download:hover {
+            background: #0077ed;
+            box-shadow: 0 4px 16px rgba(0,113,227,0.35);
+            transform: translateY(-1px);
+        }
+
+        /* 页脚 */
+        footer {
+            text-align: center;
+            padding: 32px 20px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            border-top: 1px solid var(--border);
+        }
+        footer a { color: var(--accent); text-decoration: none; }
+
+        @media (max-width: 600px) {
+            .tool-header h1 { font-size: 22px; }
+            .upload-area { padding: 32px 16px; }
+            .preview-wrapper { padding: 20px 8px; }
+            .nav-links { gap: 12px; }
+            .nav-right { gap: 12px; }
+            .nav-links a { font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== 导航栏 ===== -->
+    <nav>
+        <div class="nav-inner">
+            <a href="index.html" class="nav-logo" data-i18n="logo">📸 截图美化</a>
+            <div class="nav-right">
+                <ul class="nav-links">
+                    <li><a href="index.html" data-i18n="nav-home">首页</a></li>
+                    <li><a href="tool.html" class="active" data-i18n="nav-tool">工具</a></li>
+                    <li><a href="blog.html" data-i18n="nav-blog">博客</a></li>
+                    <li><a href="about.html" data-i18n="nav-about">关于</a></li>
+                </ul>
+                <button class="lang-switch" id="langBtn" onclick="toggleLang()">EN</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== 工具主体 ===== -->
+    <div class="container">
+        <div class="tool-header">
+            <h1 data-i18n="heading">截图圆角 + 阴影生成器</h1>
+            <p data-i18n="subheading">上传截图，拖动滑块，一键下载美化后的图片</p>
+        </div>
+
+        <!-- 上传区域 -->
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📷</div>
+            <p data-i18n="upload-text">点击上传或拖拽图片到这里</p>
+            <p class="sub" data-i18n="upload-sub">支持 PNG / JPG / WebP，图片不会上传到服务器</p>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+
+        <!-- 预览区 -->
+        <div class="preview-section" id="previewSection">
+            <div class="preview-wrapper">
+                <img id="previewImg" src="" alt="Preview">
+            </div>
+        </div>
+
+        <!-- 控制区 -->
+        <div class="controls" id="controls">
+            <div class="control-group">
+                <div class="control-label">
+                    <span data-i18n="radius-label">圆角大小</span>
+                    <span class="val" id="radiusVal">20px</span>
+                </div>
+                <input type="range" id="radiusSlider" min="0" max="60" value="20" step="1">
+            </div>
+
+            <div class="control-group">
+                <div class="control-label">
+                    <span data-i18n="shadow-label">阴影</span>
+                    <div class="shadow-row">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="shadowToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group" id="shadowControls">
+                <div class="control-label">
+                    <span data-i18n="blur-label">阴影模糊</span>
+                    <span class="val" id="blurVal">16px</span>
+                </div>
+                <input type="range" id="blurSlider" min="0" max="40" value="16" step="1">
+            </div>
+
+            <div class="control-group">
+                <div class="control-label">
+                    <span data-i18n="opacity-label">阴影透明度</span>
+                    <span class="val" id="opacityVal">25%</span>
+                </div>
+                <input type="range" id="opacitySlider" min="0" max="60" value="25" step="1">
+            </div>
+
+            <div class="control-group">
+                <div class="control-label">
+                    <span data-i18n="color-label">阴影颜色</span>
+                </div>
+                <input type="color" id="shadowColor" value="#000000" class="shadow-color-input">
+            </div>
+
+            <button class="btn-download" id="downloadBtn" data-i18n="download-btn">⬇ 下载美化后的图片</button>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer>
+        <p>© 2026 <span data-i18n="footer-brand">截图美化工具</span> · <a href="privacy.html" data-i18n="footer-privacy">隐私政策</a> · <a href="about.html" data-i18n="footer-contact">联系我们</a></p>
+    </footer>
+
+    <!-- ===== Canvas ===== -->
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <script>
+        // ========== 双语字典 ==========
+        const i18n = {
+            zh: {
+                title: '截图圆角阴影生成器 - 截图美化工具',
+                'meta-desc': '免费在线截图圆角阴影生成器，上传截图拖动滑块即可添加圆角和阴影，让截图一秒变好看。',
+                logo: '📸 截图美化',
+                'nav-home': '首页',
+                'nav-tool': '工具',
+                'nav-blog': '博客',
+                'nav-about': '关于',
+                heading: '截图圆角 + 阴影生成器',
+                subheading: '上传截图，拖动滑块，一键下载美化后的图片',
+                'upload-text': '点击上传或拖拽图片到这里',
+                'upload-sub': '支持 PNG / JPG / WebP，图片不会上传到服务器',
+                'radius-label': '圆角大小',
+                'shadow-label': '阴影',
+                'blur-label': '阴影模糊',
+                'opacity-label': '阴影透明度',
+                'color-label': '阴影颜色',
+                'download-btn': '⬇ 下载美化后的图片',
+                'footer-brand': '截图美化工具',
+                'footer-privacy': '隐私政策',
+                'footer-contact': '联系我们'
+            },
+            en: {
+                title: 'Screenshot Rounded Corners & Shadow Generator - Screenshot Beautifier',
+                'meta-desc': 'Free online tool to add rounded corners and shadows to your screenshots. Upload, drag sliders, and download in one click.',
+                logo: '📸 Screenshot Beauty',
+                'nav-home': 'Home',
+                'nav-tool': 'Tool',
+                'nav-blog': 'Blog',
+                'nav-about': 'About',
+                heading: 'Screenshot Corner & Shadow Generator',
+                subheading: 'Upload a screenshot, adjust sliders, and download your polished image in one click',
+                'upload-text': 'Click or drag an image here',
+                'upload-sub': 'Supports PNG / JPG / WebP. All processing is done locally on your device.',
+                'radius-label': 'Corner Radius',
+                'shadow-label': 'Shadow',
+                'blur-label': 'Shadow Blur',
+                'opacity-label': 'Shadow Opacity',
+                'color-label': 'Shadow Color',
+                'download-btn': '⬇ Download Enhanced Image',
+                'footer-brand': 'Screenshot Beautifier',
+                'footer-privacy': 'Privacy Policy',
+                'footer-contact': 'Contact Us'
+            }
+        };
+
+        let currentLang = 'zh';
+
+        function toggleLang() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            applyLanguage();
+        }
+
+        function applyLanguage() {
+            const dict = i18n[currentLang];
+
+            // 更新所有带 data-i18n 属性的元素
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[key]) {
+                    el.textContent = dict[key];
+                }
+            });
+
+            // 更新 title 和 meta description
+            document.title = dict.title;
+            const metaDesc = document.querySelector('meta[name="description"]');
+            if (metaDesc) metaDesc.setAttribute('content', dict['meta-desc']);
+
+            // 更新 html lang 属性
+            document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+
+            // 切换按钮文字
+            document.getElementById('langBtn').textContent = currentLang === 'zh' ? 'EN' : '中';
+
+            // 保存到本地存储
+            localStorage.setItem('lang', currentLang);
+        }
+
+        // 初始化：读取本地存储的语言偏好
+        const savedLang = localStorage.getItem('lang');
+        if (savedLang === 'en') {
+            currentLang = 'en';
+            applyLanguage();
+        }
+
+        // ========== 工具逻辑（不变） ==========
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const previewSection = document.getElementById('previewSection');
+        const previewImg = document.getElementById('previewImg');
+        const controls = document.getElementById('controls');
+        const radiusSlider = document.getElementById('radiusSlider');
+        const radiusVal = document.getElementById('radiusVal');
+        const shadowToggle = document.getElementById('shadowToggle');
+        const shadowControls = document.getElementById('shadowControls');
+        const blurSlider = document.getElementById('blurSlider');
+        const blurVal = document.getElementById('blurVal');
+        const opacitySlider = document.getElementById('opacitySlider');
+        const opacityVal = document.getElementById('opacityVal');
+        const shadowColor = document.getElementById('shadowColor');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const canvas = document.getElementById('canvas');
+
+        let originalImage = null;
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files;
+            if (file && file.type.startsWith('image/')) {
+                loadImage(file);
+            }
+        });
+
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files;
+            if (file) loadImage(file);
+        });
+
+        function loadImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    originalImage = img;
+                    previewImg.src = e.target.result;
+                    previewSection.classList.add('active');
+                    controls.classList.add('active');
+                    updatePreview();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updatePreview() {
+            if (!originalImage) return;
+
+            const radius = parseInt(radiusSlider.value);
+            const shadowOn = shadowToggle.checked;
+            const blur = parseInt(blurSlider.value);
+            const opacity = parseInt(opacitySlider.value) / 100;
+            const color = shadowColor.value;
+
+            radiusVal.textContent = radius + 'px';
+            blurVal.textContent = blur + 'px';
+            opacityVal.textContent = Math.round(opacity * 100) + '%';
+
+            previewImg.style.borderRadius = radius + 'px';
+
+            if (shadowOn) {
+                const r = parseInt(color.slice(1,3), 16);
+                const g = parseInt(color.slice(3,5), 16);
+                const b = parseInt(color.slice(5,7), 16);
+                previewImg.style.boxShadow = `0 4px ${blur}px rgba(${r},${g},${b},${opacity})`;
+            } else {
+                previewImg.style.boxShadow = 'none';
+            }
+
+            shadowControls.style.display = shadowOn ? 'block' : 'none';
+        }
+
+        shadowToggle.addEventListener('change', updatePreview);
+        radiusSlider.addEventListener('input', updatePreview);
+        blurSlider.addEventListener('input', updatePreview);
+        opacitySlider.addEventListener('input', updatePreview);
+        shadowColor.addEventListener('input', updatePreview);
+
+        downloadBtn.addEventListener('click', () => {
+            if (!originalImage) return;
+
+            const img = originalImage;
+            const radius = parseInt(radiusSlider.value);
+            const shadowOn = shadowToggle.checked;
+            const blur = parseInt(blurSlider.value);
+            const opacity = parseInt(opacitySlider.value) / 100;
+            const color = shadowColor.value;
+
+            const padding = shadowOn ? blur * 2 + 20 : 20;
+            canvas.width = img.width + padding;
+            canvas.height = img.height + padding;
+
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const imgX = padding / 2;
+            const imgY = padding / 2;
+            const imgW = img.width;
+            const imgH = img.height;
+
+            if (shadowOn) {
+                const r = parseInt(color.slice(1,3), 16);
+                const g = parseInt(color.slice(3,5), 16);
+                const b = parseInt(color.slice(5,7), 16);
+                ctx.shadowColor = `rgba(${r},${g},${b},${opacity})`;
+                ctx.shadowBlur = blur;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 4;
+            }
+
+            ctx.beginPath();
+            ctx.moveTo(imgX + radius, imgY);
+            ctx.lineTo(imgX + imgW - radius, imgY);
+            ctx.quadraticCurveTo(imgX + imgW, imgY, imgX + imgW, imgY + radius);
+            ctx.lineTo(imgX + imgW, imgY + imgH - radius);
+            ctx.quadraticCurveTo(imgX + imgW, imgY + imgH, imgX + imgW - radius, imgY + imgH);
+            ctx.lineTo(imgX + radius, imgY + imgH);
+            ctx.quadraticCurveTo(imgX, imgY + imgH, imgX, imgY + imgH - radius);
+            ctx.lineTo(imgX, imgY + radius);
+            ctx.quadraticCurveTo(imgX, imgY, imgX + radius, imgY);
+            ctx.closePath();
+            ctx.clip();
+
+            ctx.drawImage(img, imgX, imgY, imgW, imgH);
+
+            const link = document.createElement('a');
+            link.download = 'screenshot-beauty.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+
+        updatePreview();
+    </script>
+
+</body>
+</html>

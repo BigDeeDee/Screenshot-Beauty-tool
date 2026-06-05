@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="title">如何让截图更好看？圆角与阴影的实用技巧 - 截图美化工具</title>
+    <meta name="description" content="学会用圆角和阴影让普通截图瞬间变得高级，无需设计基础，3分钟掌握技巧。">
+    <style>
+        :root {
+            --bg: #f5f5f7;
+            --card-bg: #ffffff;
+            --text: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --border: #e5e5ea;
+            --accent: #0071e3;
+            --radius: 14px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.8;
+        }
+
+        /* 导航 */
+        nav {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: 56px;
+        }
+        .nav-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+        }
+        .nav-logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+        .nav-right { display: flex; align-items: center; gap: 20px; }
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+            align-items: center;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.15s;
+        }
+        .nav-links a:hover { color: var(--accent); }
+        .nav-links a.active { color: var(--accent); }
+        .lang-switch {
+            background: none;
+            border: 1.5px solid var(--border);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .lang-switch:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* 文章容器 */
+        .container {
+            max-width: 750px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+
+        /* 面包屑 */
+        .breadcrumb {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+        .breadcrumb a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        /* 文章头部 */
+        .article-header {
+            margin-bottom: 32px;
+        }
+        .article-category {
+            display: inline-block;
+            background: #e8f2ff;
+            color: var(--accent);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .article-title {
+            font-size: 34px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            line-height: 1.3;
+            margin-bottom: 12px;
+        }
+        .article-meta {
+            font-size: 14px;
+            color: #aeaeb2;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .article-meta span { white-space: nowrap; }
+        .article-meta .dot {
+            width: 4px;
+            height: 4px;
+            background: #ccc;
+            border-radius: 50%;
+        }
+
+        /* 特色图片 */
+        .featured-image {
+            width: 100%;
+            border-radius: var(--radius);
+            margin-bottom: 32px;
+            background: linear-gradient(135deg, #e8f2ff 0%, #f0e8ff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 24px;
+            font-size: 64px;
+        }
+
+        /* 文章正文 */
+        .article-content { font-size: 16px; }
+        .article-content h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 36px 0 16px;
+            letter-spacing: -0.3px;
+        }
+        .article-content h3 {
+            font-size: 19px;
+            font-weight: 600;
+            margin: 28px 0 12px;
+        }
+        .article-content p {
+            margin-bottom: 16px;
+            color: #3a3a3c;
+        }
+        .article-content ul, .article-content ol {
+            margin: 0 0 20px 24px;
+            color: #3a3a3c;
+        }
+        .article-content li { margin-bottom: 8px; }
+        .article-content strong { color: var(--text); }
+        .article-content .tip-box {
+            background: #f0f7ff;
+            border-left: 4px solid var(--accent);
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+            font-size: 15px;
+        }
+        .article-content .comparison {
+            display: flex;
+            gap: 16px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .comparison-item {
+            flex: 1;
+            min-width: 200px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+        .comparison-item .label {
+            font-size: 12px;
+            color: #aeaeb2;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .comparison-item .demo-box {
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        .comparison-item .demo-box.rounded {
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(102,126,234,0.3);
+        }
+
+        /* 页脚 */
+        footer {
+            text-align: center;
+            padding: 32px 20px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            border-top: 1px solid var(--border);
+        }
+        footer a { color: var(--accent); text-decoration: none; }
+
+        /* 返回博客 */
+        .back-to-blog {
+            display: inline-block;
+            margin-top: 32px;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .back-to-blog:hover { text-decoration: underline; }
+
+        @media (max-width: 600px) {
+            .article-title { font-size: 26px; }
+            .article-content { font-size: 15px; }
+            .nav-links { gap: 12px; }
+            .nav-right { gap: 12px; }
+            .nav-links a { font-size: 13px; }
+            .comparison { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== 导航栏 ===== -->
+    <nav>
+        <div class="nav-inner">
+            <a href="index.html" class="nav-logo" data-i18n="logo">📸 截图美化</a>
+            <div class="nav-right">
+                <ul class="nav-links">
+                    <li><a href="index.html" data-i18n="nav-home">首页</a></li>
+                    <li><a href="tool.html" data-i18n="nav-tool">工具</a></li>
+                    <li><a href="blog.html" class="active" data-i18n="nav-blog">博客</a></li>
+                    <li><a href="about.html" data-i18n="nav-about">关于</a></li>
+                </ul>
+                <button class="lang-switch" id="langBtn" onclick="toggleLang()">EN</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== 文章主体 ===== -->
+    <div class="container">
+        <!-- 面包屑 -->
+        <div class="breadcrumb">
+            <a href="index.html" data-i18n="bread-home">首页</a> &rsaquo;
+            <a href="blog.html" data-i18n="bread-blog">博客</a> &rsaquo;
+            <span data-i18n="bread-current">如何让截图更好看？圆角与阴影的实用技巧</span>
+        </div>
+
+        <!-- 文章头部 -->
+        <div class="article-header">
+            <div class="article-category" data-i18n="category">🎨 设计技巧</div>
+            <h1 class="article-title" data-i18n="article-title">如何让截图更好看？圆角与阴影的实用技巧</h1>
+            <div class="article-meta">
+                <span data-i18n="author">✍️ 截图美化团队</span>
+                <span class="dot"></span>
+                <span data-i18n="date">📅 2026年6月1日</span>
+                <span class="dot"></span>
+                <span data-i18n="read-time">⏱️ 阅读时间：4分钟</span>
+            </div>
+        </div>
+
+        <!-- 特色图片 -->
+        <div class="featured-image">🖼️✨</div>
+
+        <!-- 文章正文 - 中文版 -->
+        <div class="article-content lang-zh">
+            <p>你有没有发现，同样是截图，有些人发的图看起来就很高级，而你的截图总感觉少了点什么？其实，秘密往往藏在两个小小的细节里——<strong>圆角</strong>和<strong>阴影</strong>。</p>
+
+            <p>今天，我们就来聊聊这两个不起眼的设计元素，如何让你的截图在一秒钟内从"普通"变得"精致"。</p>
+
+            <h2>为什么圆角让截图更柔和？</h2>
+
+            <p>默认情况下，所有截图都是尖锐的直角边缘。虽然这很精确，但也给人一种生硬、未加工的感觉。相比之下，圆角能够：</p>
+
+            <ul>
+                <li><strong>降低视觉冲击</strong>：人眼处理圆角比直角更轻松，圆角引导视线更自然地流动。</li>
+                <li><strong>传达友好感</strong>：圆角在心理学上与安全、温和、亲近联系在一起，这也是为什么很多现代 UI 设计大量使用圆角。</li>
+                <li><strong>统一视觉风格</strong>：如果你把截图放在文章或社交媒体帖子中，圆角截图能更好地融入整体设计，不会显得突兀。</li>
+            </ul>
+
+            <div class="comparison">
+                <div class="comparison-item">
+                    <div class="label" data-i18n="compare-before">❌ 无圆角</div>
+                    <div class="demo-box"></div>
+                    <small>感觉生硬、未加工</small>
+                </div>
+                <div class="comparison-item">
+                    <div class="label" data-i18n="compare-after">✅ 有圆角</div>
+                    <div class="demo-box rounded"></div>
+                    <small>看起来柔和、精致</small>
+                </div>
+            </div>
+
+            <h2>阴影：给截图增加层次感</h2>
+
+            <p>扁平化的截图有时候会让人觉得"贴"在页面上，缺乏立体感。适当地添加阴影可以：</p>
+
+            <ul>
+                <li><strong>增加深度感</strong>：阴影让截图看起来像是浮在背景之上，更有层次。</li>
+                <li><strong>突出截图的边界</strong>：当截图内容与背景颜色相近时，阴影可以清晰地勾勒出截图的轮廓。</li>
+                <li><strong>提升专业度</strong>：恰到好处的阴影是设计师常用的手法，能让你的截图瞬间拥有"专业感"。</li>
+            </ul>
+
+            <div class="tip-box">
+                <strong>💡 小贴士：</strong>阴影不宜过重。一般来说，透明度控制在<strong>15%-30%</strong>之间，模糊值在<strong>12-24px</strong>左右，效果最自然。过重的阴影反而会显得廉价。
+            </div>
+
+            <h2>圆角和阴影的最佳搭配</h2>
+
+            <p>那么，什么样的参数组合能让截图最好看呢？根据我们的经验，这里有一些推荐的搭配：</p>
+
+            <h3>🟢 清新简约风</h3>
+            <ul>
+                <li>圆角：16-20px</li>
+                <li>阴影模糊：12-16px</li>
+                <li>阴影透明度：15-20%</li>
+                <li><strong>适合场景</strong>：博客文章、产品文档</li>
+            </ul>
+
+            <h3>🔵 精致卡片风</h3>
+            <ul>
+                <li>圆角：20-28px</li>
+                <li>阴影模糊：20-24px</li>
+                <li>阴影透明度：20-25%</li>
+                <li><strong>适合场景</strong>：社交媒体分享、封面图</li>
+            </ul>
+
+            <h3>🟣 大胆突出风</h3>
+            <ul>
+                <li>圆角：12-16px</li>
+                <li>阴影模糊：24-32px</li>
+                <li>阴影透明度：25-30%</li>
+                <li><strong>适合场景</strong>：产品展示、落地页</li>
+            </ul>
+
+            <h2>使用我们的工具，3秒钟搞定</h2>
+
+            <p>现在你已经了解了圆角和阴影的搭配技巧。接下来就是动手实践了！使用我们的<a href="tool.html">截图圆角阴影生成器</a>，你只需要：</p>
+
+            <ol>
+                <li>上传你的截图</li>
+                <li>拖动滑块调整圆角和阴影参数</li>
+                <li>预览效果满意后，一键下载</li>
+            </ol>
+
+            <p><strong>最棒的是</strong>：所有处理都在你的浏览器本地完成，图片不会上传到任何服务器，完全保护你的隐私。</p>
+
+            <h2>总结</h2>
+
+            <p>截图美化并不需要复杂的设计技能。记住这三个要点，你的截图就能提升一个档次：</p>
+
+            <ul>
+                <li>✅ 添加适当圆角，让截图更柔和</li>
+                <li>✅ 加入柔和阴影，增加层次感</li>
+                <li>✅ 根据不同场景选择合适的参数搭配</li>
+            </ul>
+
+            <p>现在就去<a href="tool.html">试试我们的工具</a>吧，让你的下一张截图惊艳所有人！🚀</p>
+        </div>
+
+        <!-- 文章正文 - 英文版 -->
+        <div class="article-content lang-en" style="display:none;">
+            <p>Have you ever noticed how some people's screenshots look incredibly polished while yours always seem to be missing something? The secret often lies in two tiny details—<strong>rounded corners</strong> and <strong>shadows</strong>.</p>
+
+            <p>Today, let's explore how these two understated design elements can transform your screenshots from "plain" to "polished" in seconds.</p>
+
+            <h2>Why Rounded Corners Make Screenshots Softer?</h2>
+
+            <p>By default, all screenshots have sharp, right‑angled edges. While precise, they can feel rigid and unrefined. In contrast, rounded corners:</p>
+
+            <ul>
+                <li><strong>Reduce visual tension</strong>: The human eye processes rounded corners more easily than sharp ones, allowing the gaze to flow more naturally.</li>
+                <li><strong>Convey friendliness</strong>: Psychologically, rounded corners are associated with safety, warmth, and approachability—which is why modern UI design uses them extensively.</li>
+                <li><strong>Unify visual style</strong>: When you place a screenshot inside an article or social media post, rounded corners help it blend seamlessly into the overall design rather than sticking out awkwardly.</li>
+            </ul>
+
+            <div class="comparison">
+                <div class="comparison-item">
+                    <div class="label">❌ No Radius</div>
+                    <div class="demo-box"></div>
+                    <small>Feels rigid, unprocessed</small>
+                </div>
+                <div class="comparison-item">
+                    <div class="label">✅ With Radius</div>
+                    <div class="demo-box rounded"></div>
+                    <small>Looks soft, refined</small>
+                </div>
+            </div>
+
+            <h2>Shadows: Adding Depth to Screenshots</h2>
+
+            <p>Flat screenshots can sometimes feel "stuck" to the page, lacking dimension. A well‑placed shadow can:</p>
+
+            <ul>
+                <li><strong>Create depth</strong>: Shadows make screenshots appear to float above the background, adding visual hierarchy.</li>
+                <li><strong>Define boundaries</strong>: When the screenshot content blends with the background color, a shadow clearly outlines its edges.</li>
+                <li><strong>Boost professionalism</strong>: A tasteful shadow is a designer's trick that instantly gives your screenshots a "pro" look.</li>
+            </ul>
+
+            <div class="tip-box">
+                <strong>💡 Pro Tip:</strong> Less is more with shadows. Aim for <strong>15%–30% opacity</strong> and <strong>12–24px blur</strong> for the most natural effect. Heavy shadows tend to look cheap.
+            </div>
+
+            <h2>Best Combinations of Radius and Shadow</h2>
+
+            <p>So what parameter combinations produce the best‑looking screenshots? Based on our experience, here are some recommended pairings:</p>
+
+            <h3>🟢 Clean & Minimal</h3>
+            <ul>
+                <li>Corner radius: 16–20px</li>
+                <li>Shadow blur: 12–16px</li>
+                <li>Shadow opacity: 15–20%</li>
+                <li><strong>Best for</strong>: Blog posts, product documentation</li>
+            </ul>
+
+            <h3>🔵 Elegant Card Style</h3>
+            <ul>
+                <li>Corner radius: 20–28px</li>
+                <li>Shadow blur: 20–24px</li>
+                <li>Shadow opacity: 20–25%</li>
+                <li><strong>Best for</strong>: Social media sharing, cover images</li>
+            </ul>
+
+            <h3>🟣 Bold & Eye‑Catching</h3>
+            <ul>
+                <li>Corner radius: 12–16px</li>
+                <li>Shadow blur: 24–32px</li>
+                <li>Shadow opacity: 25–30%</li>
+                <li><strong>Best for</strong>: Product showcases, landing pages</li>
+            </ul>
+
+            <h2>Get It Done in 3 Seconds with Our Tool</h2>
+
+            <p>Now that you understand the art of combining rounded corners and shadows, it's time to put it into practice! With our <a href="tool.html">Screenshot Corner & Shadow Generator</a>, all you need to do is:</p>
+
+            <ol>
+                <li>Upload your screenshot</li>
+                <li>Drag the sliders to adjust corner radius and shadow</li>
+                <li>Preview the result and download with one click
+            </ol>
+
+            <p><strong>Best of all</strong>: All processing happens locally in your browser. Your images are never uploaded to any server—complete privacy guaranteed.</p>
+
+            <h2>Summary</h2>
+
+            <p>Beautifying screenshots doesn't require complex design skills. Remember these three key points and your screenshots will level up instantly:</p>
+
+            <ul>
+                <li>✅ Add appropriate rounded corners for a softer look</li>
+                <li>✅ Use subtle shadows to create depth</li>
+                <li>✅ Choose the right parameter combination for each scenario</li>
+            </ul>
+
+            <p>Head over to <a href="tool.html">try our tool now</a> and make your next screenshot wow everyone! 🚀</p>
+        </div>
+
+        <!-- 返回博客 -->
+        <a href="blog.html" class="back-to-blog" data-i18n="back-blog">← 返回博客列表</a>
+    </div>
+
+    <!-- ===== 页脚 ===== -->
+    <footer>
+        <p>© 2026 <span data-i18n="footer-brand">截图美化工具</span> · <a href="privacy.html" data-i18n="footer-privacy">隐私政策</a> · <a href="about.html" data-i18n="footer-contact">联系我们</a></p>
+    </footer>
+
+    <!-- ===== 双语切换脚本 ===== -->
+    <script>
+        const i18n = {
+            zh: {
+                title: '如何让截图更好看？圆角与阴影的实用技巧 - 截图美化工具',
+                logo: '📸 截图美化',
+                'nav-home': '首页',
+                'nav-tool': '工具',
+                'nav-blog': '博客',
+                'nav-about': '关于',
+                'bread-home': '首页',
+                'bread-blog': '博客',
+                'bread-current': '如何让截图更好看？圆角与阴影的实用技巧',
+                category: '🎨 设计技巧',
+                'article-title': '如何让截图更好看？圆角与阴影的实用技巧',
+                author: '✍️ 截图美化团队',
+                date: '📅 2026年6月1日',
+                'read-time': '⏱️ 阅读时间：4分钟',
+                'compare-before': '❌ 无圆角',
+                'compare-after': '✅ 有圆角',
+                'back-blog': '← 返回博客列表',
+                'footer-brand': '截图美化工具',
+                'footer-privacy': '隐私政策',
+                'footer-contact': '联系我们'
+            },
+            en: {
+                title: 'How to Make Screenshots Look Better? Tips for Rounded Corners & Shadows - Screenshot Beautifier',
+                logo: '📸 Screenshot Beauty',
+                'nav-home': 'Home',
+                'nav-tool': 'Tool',
+                'nav-blog': 'Blog',
+                'nav-about': 'About',
+                'bread-home': 'Home',
+                'bread-blog': 'Blog',
+                'bread-current': 'How to Make Screenshots Look Better? Tips for Rounded Corners & Shadows',
+                category: '🎨 Design Tips',
+                'article-title': 'How to Make Screenshots Look Better? Tips for Rounded Corners & Shadows',
+                author: '✍️ Screenshot Beauty Team',
+                date: '📅 June 1, 2026',
+                'read-time': '⏱️ Reading time: 4 min',
+                'compare-before': '❌ No Radius',
+                'compare-after': '✅ With Radius',
+                'back-blog': '← Back to Blog',
+                'footer-brand': 'Screenshot Beautifier',
+                'footer-privacy': 'Privacy Policy',
+                'footer-contact': 'Contact Us'
+            }
+        };
+
+        let currentLang = 'zh';
+
+        function toggleLang() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            applyLanguage();
+        }
+
+        function applyLanguage() {
+            const dict = i18n[currentLang];
+
+            // 更新 data-i18n 短文本
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[key]) el.textContent = dict[key];
+            });
+
+            // 切换长文本：显示/隐藏
+            document.querySelectorAll('.lang-zh').forEach(el => {
+                el.style.display = currentLang === 'zh' ? '' : 'none';
+            });
+            document.querySelectorAll('.lang-en').forEach(el => {
+                el.style.display = currentLang === 'en' ? '' : 'none';
+            });
+
+            // 更新标题和 meta
+            document.title = dict.title;
+            const metaDesc = document.querySelector('meta[name="description"]');
+            if (metaDesc) {
+                metaDesc.setAttribute('content',
+                    currentLang === 'zh'
+                        ? '学会用圆角和阴影让普通截图瞬间变得高级，无需设计基础，3分钟掌握技巧。'
+                        : 'Learn how to use rounded corners and shadows to instantly elevate your screenshots. No design skills needed.'
+                );
+            }
+
+            document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+            document.getElementById('langBtn').textContent = currentLang === 'zh' ? 'EN' : '中';
+            localStorage.setItem('lang', currentLang);
+        }
+
+        // 初始化语言
+        const savedLang = localStorage.getItem('lang');
+        if (savedLang === 'en') { currentLang = 'en'; applyLanguage(); }
+    </script>
+</body>
+</html>
