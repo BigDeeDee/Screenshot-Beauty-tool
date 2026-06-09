@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="title">不用PS！浏览器里3步搞定截图美化 - 截图美化工具</title>
+    <meta name="description" content="告别复杂的Photoshop，学会用浏览器在线工具快速美化截图，3步完成圆角、阴影、背景处理，提升工作效率。">
+    <style>
+        :root {
+            --bg: #f5f5f7;
+            --card-bg: #ffffff;
+            --text: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --border: #e5e5ea;
+            --accent: #0071e3;
+            --radius: 14px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.8;
+        }
+
+        /* 导航 */
+        nav {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: 56px;
+        }
+        .nav-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+        }
+        .nav-logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+        .nav-right { display: flex; align-items: center; gap: 20px; }
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+            align-items: center;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.15s;
+        }
+        .nav-links a:hover { color: var(--accent); }
+        .nav-links a.active { color: var(--accent); }
+        .lang-switch {
+            background: none;
+            border: 1.5px solid var(--border);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .lang-switch:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* 文章容器 */
+        .container {
+            max-width: 750px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+
+        /* 面包屑 */
+        .breadcrumb {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+        .breadcrumb a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        /* 文章头部 */
+        .article-header {
+            margin-bottom: 32px;
+        }
+        .article-category {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .article-title {
+            font-size: 34px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            line-height: 1.3;
+            margin-bottom: 12px;
+        }
+        .article-meta {
+            font-size: 14px;
+            color: #aeaeb2;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .article-meta span { white-space: nowrap; }
+        .article-meta .dot {
+            width: 4px;
+            height: 4px;
+            background: #ccc;
+            border-radius: 50%;
+        }
+
+        /* 特色图片 */
+        .featured-image {
+            width: 100%;
+            border-radius: var(--radius);
+            margin-bottom: 32px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 24px;
+            font-size: 80px;
+            color: white;
+        }
+
+        /* 文章正文 */
+        .article-content { font-size: 16px; }
+        .article-content h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 36px 0 16px;
+            letter-spacing: -0.3px;
+        }
+        .article-content h3 {
+            font-size: 19px;
+            font-weight: 600;
+            margin: 28px 0 12px;
+        }
+        .article-content p {
+            margin-bottom: 16px;
+            color: #3a3a3c;
+        }
+        .article-content ul, .article-content ol {
+            margin: 0 0 20px 24px;
+            color: #3a3a3c;
+        }
+        .article-content li { margin-bottom: 8px; }
+        .article-content strong { color: var(--text); }
+        .article-content .tip-box {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+            font-size: 15px;
+        }
+        .article-content .warning-box {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+            font-size: 15px;
+        }
+        .article-content .step-box {
+            background: #f5f5f5;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            border: 1px solid var(--border);
+        }
+        .article-content .step-number {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+        .article-content .step-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+        .article-content .time-saving {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #e8f5e9;
+            padding: 16px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .article-content .time-saving-icon {
+            font-size: 24px;
+        }
+        .article-content .time-saving-text {
+            font-size: 15px;
+            font-weight: 600;
+            color: #2e7d32;
+        }
+
+        /* 返回博客 */
+        .back-to-blog {
+            display: inline-block;
+            margin-top: 32px;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .back-to-blog:hover { text-decoration: underline; }
+
+        /* 页脚 */
+        footer {
+            text-align: center;
+            padding: 32px 20px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            border-top: 1px solid var(--border);
+        }
+        footer a { color: var(--accent); text-decoration: none; }
+
+        @media (max-width: 600px) {
+            .article-title { font-size: 26px; }
+            .article-content { font-size: 15px; }
+            .nav-links { gap: 12px; }
+            .nav-right { gap: 12px; }
+            .nav-links a { font-size: 13px; }
+            .featured-image { font-size: 48px; padding: 40px 16px; }
+            .step-box { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 导航栏 -->
+    <nav>
+        <div class="nav-inner">
+            <a href="index.html" class="nav-logo" data-i18n="logo">📸 截图美化</a>
+            <div class="nav-right">
+                <ul class="nav-links">
+                    <li><a href="index.html" data-i18n="nav-home">首页</a></li>
+                    <li><a href="tool.html" data-i18n="nav-tool">工具</a></li>
+                    <li><a href="blog.html" class="active" data-i18n="nav-blog">博客</a></li>
+                    <li><a href="about.html" data-i18n="nav-about">关于</a></li>
+                </ul>
+                <button class="lang-switch" id="langBtn" onclick="toggleLang()">EN</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 文章主体 -->
+    <div class="container">
+        <!-- 面包屑 -->
+        <div class="breadcrumb">
+            <a href="index.html" data-i18n="bread-home">首页</a> &rsaquo;
+            <a href="blog.html" data-i18n="bread-blog">博客</a> &rsaquo;
+            <span data-i18n="bread-current">不用PS！浏览器里3步搞定截图美化</span>
+        </div>
+
+        <!-- 文章头部 -->
+        <div class="article-header">
+            <div class="article-category" data-i18n="category">⚡ 效率提升</div>
+            <h1 class="article-title" data-i18n="article-title">不用PS！浏览器里3步搞定截图美化</h1>
+            <div class="article-meta">
+                <span data-i18n="author">✍️ 截图美化团队</span>
+                <span class="dot"></span>
+                <span data-i18n="date">📅 2026年6月8日</span>
+                <span class="dot"></span>
+                <span data-i18n="read-time">⏱️ 阅读时间：3分钟</span>
+            </div>
+        </div>
+
+        <!-- 特色图片 -->
+        <div class="featured-image">🚀</div>
+
+        <!-- 中文正文 -->
+        <div class="article-content lang-zh">
+            <p>还在为美化一张截图而打开Photoshop吗？还在为调整圆角、阴影而反复切换图层吗？还在为导出格式、压缩质量而纠结吗？</p>
+
+            <p>如果你和我一样，经常需要处理截图——无论是写公众号、做PPT、还是发社交媒体——那么今天这篇文章将彻底改变你的工作流。我将分享一个<strong>完全在浏览器里完成、无需安装任何软件、3步搞定截图美化</strong>的高效方法。</p>
+
+            <div class="time-saving">
+                <div class="time-saving-icon">⏰</div>
+                <div class="time-saving-text">传统PS流程 vs 浏览器工具：从5分钟缩短到30秒</div>
+            </div>
+
+            <h2>传统方法的痛点</h2>
+            <p>在介绍新方法之前，我们先看看传统截图美化的痛点：</p>
+            <ul>
+                <li><strong>软件太重</strong>：Photoshop启动慢、占用内存大，只为改一张截图而打开它，就像用大炮打蚊子</li>
+                <li><strong>操作复杂</strong>：新建画布、导入图片、添加圆角、调整阴影、导出优化...一套流程下来至少5分钟</li>
+                <li><strong>学习成本高</strong>：图层、蒙版、导出设置...非设计师很难快速掌握</li>
+                <li><strong>跨平台问题</strong>：电脑上没有PS怎么办？手机截图怎么处理？</li>
+            </ul>
+
+            <h2>浏览器3步美化法</h2>
+            <p>现在，让我们看看如何用浏览器工具在30秒内完成同样的效果：</p>
+
+            <div class="step-box">
+                <div class="step-title"><span class="step-number">1</span> 上传截图</div>
+                <p>打开<a href="tool.html">截图美化工具</a>，直接把截图拖拽到上传区域，或者点击选择文件。支持PNG、JPG、WebP格式，<strong>图片不会上传到任何服务器</strong>，所有处理都在你的浏览器本地完成，100%保护隐私。</p>
+            </div>
+
+            <div class="step-box">
+                <div class="step-title"><span class="step-number">2</span> 调整参数</div>
+                <p>通过简单的滑块调整：</p>
+                <ul>
+                    <li><strong>圆角大小</strong>：拖动滑块，实时预览圆角效果</li>
+                    <li><strong>阴影效果</strong>：一键开关阴影，调整模糊度和透明度</li>
+                    <li><strong>背景颜色</strong>：为截图添加纯色背景，让它在任何背景下都突出</li>
+                </ul>
+                <p>所有调整都是<strong>实时预览</strong>，所见即所得，不需要任何设计基础。</p>
+            </div>
+
+            <div class="step-box">
+                <div class="step-title"><span class="step-number">3</span> 下载使用</div>
+                <p>点击下载按钮，获得一张高质量的PNG图片。这张图片可以直接：</p>
+                <ul>
+                    <li>插入公众号文章编辑器</li>
+                    <li>粘贴到PPT或Keynote中</li>
+                    <li>分享到小红书、微博等社交媒体</li>
+                    <li>用作产品文档配图</li>
+                </ul>
+            </div>
+
+            <div class="tip-box">
+                <strong>💡 效率小技巧：</strong> 如果你经常需要处理类似风格的截图，可以记住一组"黄金参数"（比如圆角16px、阴影模糊20px、透明度25%），以后每次都直接套用，10秒就能完成一张。
+            </div>
+
+            <h2>实际场景对比</h2>
+            <p>让我们看看不同场景下的效率提升：</p>
+
+            <h3>场景一：公众号配图</h3>
+            <ul>
+                <li><strong>传统方法</strong>：打开PS → 新建画布 → 导入截图 → 添加圆角 → 调整阴影 → 导出为PNG → 压缩图片 → 上传到公众号后台（约5-7分钟）</li>
+                <li><strong>浏览器工具</strong>：打开工具页 → 拖拽上传 → 调整滑块 → 下载 → 直接上传（约30秒）</li>
+            </ul>
+
+            <h3>场景二：团队周报截图</h3>
+            <ul>
+                <li><strong>传统方法</strong>：截图 → 打开PS → 处理 → 保存 → 插入文档（约3-5分钟）</li>
+                <li><strong>浏览器工具</strong>：截图 → 打开工具页 → 处理 → 下载 → 插入文档（约20秒）</li>
+            </ul>
+
+            <h3>场景三：社交媒体分享</h3>
+            <ul>
+                <li><strong>传统方法</strong>：用手机截图 → 发到电脑 → 用PS处理 → 发回手机 → 发布（约5分钟）</li>
+                <li><strong>浏览器工具</strong>：用手机截图 → 在手机浏览器打开工具页 → 处理 → 直接发布（约40秒）</li>
+            </ul>
+
+            <div class="warning-box">
+                <strong>⚠️ 注意：</strong> 这个方法最适合<strong>快速美化日常截图</strong>。如果你需要复杂的图像编辑（如去水印、合成多图、精细调色），专业软件仍然是更好的选择。
+            </div>
+
+            <h2>为什么选择浏览器工具？</h2>
+            <p>除了速度快，浏览器工具还有这些优势：</p>
+            <ul>
+                <li><strong>零成本</strong>：完全免费，没有订阅费、没有水印</li>
+                <li><strong>跨平台</strong>：Windows、Mac、Linux、手机都能用，只要有浏览器</li>
+                <li><strong>无需安装</strong>：不用下载软件，不占用硬盘空间</li>
+                <li><strong>隐私安全</strong>：图片在本地处理，不会上传到任何服务器</li>
+                <li><strong>持续更新</strong>：工具会不断优化，你永远用最新版本</li>
+            </ul>
+
+            <h2>开始你的高效工作流</h2>
+            <p>下次当你需要美化截图时，不要再下意识地打开PS了。记住这个3步流程：</p>
+            <ol>
+                <li>打开浏览器，进入<a href="tool.html">截图美化工具</a></li>
+                <li>上传截图，拖动滑块调整效果</li>
+                <li>下载，完成</li>
+            </ol>
+
+            <p>把省下来的时间，用来创造更多有价值的内容。效率工具的意义，不就是让我们更专注于真正重要的事情吗？</p>
+
+            <p>现在就去<a href="tool.html">试试这个3步工作流</a>，感受一下从5分钟到30秒的效率飞跃吧！⚡</p>
+        </div>
+
+        <!-- 英文正文 -->
+        <div class="article-content lang-en" style="display:none;">
+            <p>Still opening Photoshop just to beautify a screenshot? Still toggling layers back and forth to adjust rounded corners and shadows? Still struggling with export formats and compression quality?</p>
+
+            <p>If you're like me and often need to process screenshots—whether for WeChat articles, PowerPoint presentations, or social media—this article will completely change your workflow. I'll share an efficient method that <strong>happens entirely in your browser, requires no software installation, and beautifies screenshots in just 3 steps</strong>.</p>
+
+            <div class="time-saving">
+                <div class="time-saving-icon">⏰</div>
+                <div class="time-saving-text">Traditional PS workflow vs Browser tool: from 5 minutes down to 30 seconds</div>
+            </div>
+
+            <h2>Pain Points of Traditional Methods</h2>
+            <p>Before introducing the new method, let's look at the pain points of traditional screenshot beautification:</p>
+            <ul>
+                <li><strong>Software is heavy</strong>: Photoshop starts slowly, consumes a lot of memory—opening it just to edit one screenshot is like using a cannon to kill a mosquito</li>
+                <li><strong>Complex operations</strong>: New canvas, import image, add rounded corners, adjust shadows, export optimization... The whole process takes at least 5 minutes</li>
+                <li><strong>High learning curve</strong>: Layers, masks, export settings... Non-designers struggle to master quickly</li>
+                <li><strong>Cross-platform issues</strong>: What if you don't have PS on your computer? How to process mobile screenshots?</li>
+            </ul>
+
+            <h2>Browser 3-Step Beautification Method</h2>
+            <p>Now, let's see how to achieve the same result in 30 seconds using a browser tool:</p>
+
+            <div class="step-box">
+                <div class="step-title"><span class="step-number">1</span> Upload Screenshot</div>
+                <p>Open the <a href="tool.html">Screenshot Beautifier</a>, drag and drop your screenshot into the upload area, or click to select a file. Supports PNG, JPG, and WebP formats. <strong>Images are never uploaded to any server</strong>—all processing happens locally in your browser, 100% privacy protected.</p>
+            </div>
+
+            <div class="step-box">
+                <div class="step-title"><span class="step-number">2</span> Adjust Parameters</div>
+                <p>Adjust with simple sliders:</p>
+                <ul>
+                    <li><strong>Corner Radius</strong>: Drag the slider to preview rounded corners in real time</li>
+                    <li><strong>Shadow Effect</strong>: Toggle shadows on/off, adjust blur and opacity</li>
+                    <li><strong>Background Color</strong>: Add a solid color background to make your screenshot stand out on any background</li>
+                </ul>
+                <p>All adjustments are <strong>previewed in real time</strong>—what you see is what you get. No design skills required.</p>
+            </div>
+
+            <div class="step-box">
+                <div class="step-title"><span class="step-number">3</span> Download and Use</div>
+                <p>Click the download button to get a high-quality PNG image. This image can be directly:</p>
+                <ul>
+                    <li>Inserted into WeChat article editors</li>
+                    <li>Pasted into PowerPoint or Keynote</li>
+                    <li>Shared on Xiaohongshu, Weibo, and other social media</li>
+                    <li>Used as product documentation images</li>
+                </ul>
+            </div>
+
+            <div class="tip-box">
+                <strong>💡 Efficiency Tip:</strong> If you often need to process screenshots with similar styles, remember a set of "golden parameters" (e.g., 16px corner radius, 20px shadow blur, 25% opacity) and apply them every time. You can finish one screenshot in just 10 seconds.
+            </div>
+
+            <h2>Real-World Scenario Comparison</h2>
+            <p>Let's look at efficiency improvements in different scenarios:</p>
+
+            <h3>Scenario 1: WeChat Article Images</h3>
+            <ul>
+                <li><strong>Traditional Method</strong>: Open PS → New canvas → Import screenshot → Add rounded corners → Adjust shadows → Export as PNG → Compress image → Upload to WeChat backend (≈5-7 minutes)</li>
+                <li><strong>Browser Tool</strong>: Open tool page → Drag and drop upload → Adjust sliders → Download → Direct upload (≈30 seconds)</li>
+            </ul>
+
+            <h3>Scenario 2: Team Weekly Report Screenshots</h3>
+            <ul>
+                <li><strong>Traditional Method</strong>: Screenshot → Open PS → Process → Save → Insert into document (≈3-5 minutes)</li>
+                <li><strong>Browser Tool</strong>: Screenshot → Open tool page → Process → Download → Insert into document (≈20 seconds)</li>
+            </ul>
+
+            <h3>Scenario 3: Social Media Sharing</h3>
+            <ul>
+                <li><strong>Traditional Method</strong>: Take screenshot on phone → Send to computer → Process with PS → Send back to phone → Post (≈5 minutes)</li>
+                <li><strong>Browser Tool</strong>: Take screenshot on phone → Open tool page in mobile browser → Process → Post directly (≈40 seconds)</li>
+            </ul>
+
+            <div class="warning-box">
+                <strong>⚠️ Note:</strong> This method is best for <strong>quickly beautifying everyday screenshots</strong>. If you need complex image editing (like watermark removal, multi-image compositing, or precise color grading), professional software is still the better choice.
+            </div>
+
+            <h2>Why Choose Browser Tools?</h2>
+            <p>Besides speed, browser tools offer these advantages:</p>
+            <ul>
+                <li><strong>Zero cost</strong>: Completely free, no subscription fees, no watermarks</li>
+                <li><strong>Cross-platform</strong>: Works on Windows, Mac, Linux, and mobile—anywhere with a browser</li>
+                <li><strong>No installation</strong>: No software to download, no hard drive space used</li>
+                <li><strong>Privacy safe</strong>: Images are processed locally, never uploaded to any server</li>
+                <li><strong>Continuous updates</strong>: The tool keeps improving—you always use the latest version</li>
+            </ul>
+
+            <h2>Start Your Efficient Workflow</h2>
+            <p>Next time you need to beautify a screenshot, don't instinctively open Photoshop. Remember this 3-step process:</p>
+            <ol>
+                <li>Open your browser and go to the <a href="tool.html">Screenshot Beautifier</a></li>
+                <li>Upload your screenshot, adjust with sliders</li>
+                <li>Download, done</li>
+            </ol>
+
+            <p>Use the time you save to create more valuable content. Isn't that what efficiency tools are for—letting us focus on what truly matters?</p>
+
+            <p>Go ahead and <a href="tool.html">try this 3-step workflow</a> now, and experience the efficiency leap from 5 minutes to 30 seconds! ⚡</p>
+        </div>
+
+        <!-- 返回博客 -->
+        <a href="blog.html" class="back-to-blog" data-i18n="back-blog">← 返回博客列表</a>
+    </div>
+
+    <!-- 页脚 -->
+    <footer>
+        <p>© 2026 <span data-i18n="footer-brand">截图美化工具</span> · <a href="privacy.html" data-i18n="footer-privacy">隐私政策</a> · <a href="about.html" data-i18n="footer-contact">联系我们</a></p>
+    </footer>
+
+    <!-- 双语切换脚本 -->
+    <script>
+        const i18n = {
+            zh: {
+                title: '不用PS！浏览器里3步搞定截图美化 - 截图美化工具',
+                logo: '📸 截图美化',
+                'nav-home': '首页',
+                'nav-tool': '工具',
+                'nav-blog': '博客',
+                'nav-about': '关于',
+                'bread-home': '首页',
+                'bread-blog': '博客',
+                'bread-current': '不用PS！浏览器里3步搞定截图美化',
+                category: '⚡ 效率提升',
+                'article-title': '不用PS！浏览器里3步搞定截图美化',
+                author: '✍️ 截图美化团队',
+                date: '📅 2026年6月8日',
+                'read-time': '⏱️ 阅读时间：3分钟',
+                'back-blog': '← 返回博客列表',
+                'footer-brand': '截图美化工具',
+                'footer-privacy': '隐私政策',
+                'footer-contact': '联系我们'
+            },
+            en: {
+                title: 'No PS Needed! Beautify Screenshots in 3 Steps Right in Your Browser - Screenshot Beautifier',
+                logo: '📸 Screenshot Beauty',
+                'nav-home': 'Home',
+                'nav-tool': 'Tool',
+                'nav-blog': 'Blog',
+                'nav-about': 'About',
+                'bread-home': 'Home',
+                'bread-blog': 'Blog',
+                'bread-current': 'No PS Needed! Beautify Screenshots in 3 Steps Right in Your Browser',
+                category: '⚡ Efficiency Boost',
+                'article-title': 'No PS Needed! Beautify Screenshots in 3 Steps Right in Your Browser',
+                author: '✍️ Screenshot Beauty Team',
+                date: '📅 June 8, 2026',
+                'read-time': '⏱️ Reading time: 3 min',
+                'back-blog': '← Back to Blog',
+                'footer-brand': 'Screenshot Beautifier',
+                'footer-privacy': 'Privacy Policy',
+                'footer-contact': 'Contact Us'
+            }
+        };
+
+        let currentLang = 'zh';
+
+        function toggleLang() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            applyLanguage();
+        }
+
+        function applyLanguage() {
+            const dict = i18n[currentLang];
+
+            // 更新 data-i18n 短文本
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[key]) el.textContent = dict[key];
+            });
+
+            // 切换长文本显示/隐藏
+            document.querySelectorAll('.lang-zh').forEach(el => {
+                el.style.display = currentLang === 'zh' ? '' : 'none';
+            });
+            document.querySelectorAll('.lang-en').forEach(el => {
+                el.style.display = currentLang === 'en' ? '' : 'none';
+            });
+
+            // 更新标题和元数据
+            document.title = dict.title;
+            const metaDesc = document.querySelector('meta[name="description"]');
+            if (metaDesc) {
+                metaDesc.setAttribute('content',
+                    currentLang === 'zh'
+                        ? '告别复杂的Photoshop，学会用浏览器在线工具快速美化截图，3步完成圆角、阴影、背景处理，提升工作效率。'
+                        : 'Say goodbye to complex Photoshop. Learn to quickly beautify screenshots with browser-based tools in 3 steps: rounded corners, shadows, background processing—boost your workflow efficiency.'
+                );
+            }
+
+            document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+            document.getElementById('langBtn').textContent = currentLang === 'zh' ? 'EN' : '中';
+            localStorage.setItem('lang', currentLang);
+        }
+
+        // 初始化语言
+        const savedLang = localStorage.getItem('lang');
+        if (savedLang === 'en') { currentLang = 'en'; applyLanguage(); }
+    </script>
+</body>
+</html>
